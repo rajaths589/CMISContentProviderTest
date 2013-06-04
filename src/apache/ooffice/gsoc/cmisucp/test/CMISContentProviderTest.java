@@ -41,6 +41,7 @@ import com.sun.star.ucb.XContentProvider;
 import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XInterface;
+import com.sun.star.util.Date;
 
 /**
  *
@@ -85,13 +86,14 @@ public class CMISContentProviderTest {
             Property p1[] = new Property[2];
             p1[0] = p;
             Property p2 = new Property();
-            p2.Name = "Size";
+            p2.Name = "DateCreated";
             p1[1] = p2;
             cmd.Argument = p1;
             XRow xr;
             xr = (XRow) AnyConverter.toObject(XRow.class,xcp.execute(cmd,  0, null));
             System.out.println(xr.getString(1));
-            System.out.println(xr.getInt(2));
+            Date d = xr.getDate(2);
+            System.out.println(d.Day+"/"+d.Month+"/"+d.Year);
             
         }
         catch (java.lang.Exception e){
