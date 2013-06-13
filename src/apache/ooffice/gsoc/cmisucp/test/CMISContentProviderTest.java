@@ -31,13 +31,18 @@ import com.sun.star.beans.Property;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.lang.XMultiComponentFactory;
+import com.sun.star.sdbc.XResultSet;
 import com.sun.star.sdbc.XRow;
 import com.sun.star.ucb.Command;
+import com.sun.star.ucb.OpenCommandArgument;
+import com.sun.star.ucb.OpenCommandArgument2;
+import com.sun.star.ucb.OpenMode;
 import com.sun.star.ucb.XCommandProcessor;
 import com.sun.star.ucb.XContent;
 import com.sun.star.ucb.XContentIdentifier;
 import com.sun.star.ucb.XContentIdentifierFactory;
 import com.sun.star.ucb.XContentProvider;
+import com.sun.star.ucb.XDynamicResultSet;
 import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XInterface;
@@ -74,7 +79,7 @@ public class CMISContentProviderTest {
             xUCB = (XInterface) xmcf.createInstanceWithArgumentsAndContext("com.sun.star.ucb.UniversalContentBroker", keys,xContext);
             XContentIdentifierFactory xIDFactory = (XContentIdentifierFactory)UnoRuntime.queryInterface(XContentIdentifierFactory.class, xUCB);
             XContentProvider ucp = (XContentProvider)UnoRuntime.queryInterface(XContentProvider.class, xUCB);
-            XContentIdentifier id = xIDFactory.createContentIdentifier("cmis:///CMISUpload.odt");
+            XContentIdentifier id = xIDFactory.createContentIdentifier("cmis:///My_Folder-0-0");
             XContent cmisContent = ucp.queryContent(id);
             XCommandProcessor xcp = (XCommandProcessor)UnoRuntime.queryInterface(XCommandProcessor.class, cmisContent);
             System.out.println(cmisContent.getContentType());
@@ -94,6 +99,36 @@ public class CMISContentProviderTest {
             System.out.println(xr.getString(1));
             Date d = xr.getDate(2);
             System.out.println(d.Day+"/"+d.Month+"/"+d.Year);
+            
+            OpenCommandArgument2 oc = new OpenCommandArgument2();
+            oc.Mode = OpenMode.ALL;
+            Property pxx[];
+            pxx = new Property[2];
+            
+            Property pa = new Property();
+            pa.Name = "Title";
+            pxx[0] = pa;
+            Property pb = new Property();
+            pb.Name = "Size";
+            pxx[1] = pb;
+            
+            oc.Properties = pxx;
+            Command cm = new Command();
+            cm.Name = "open";
+            cm.Argument = oc;
+            
+            XDynamicResultSet xDRS;
+            xDRS = (XDynamicResultSet) xcp.execute(cm,0,null);
+            
+            XResultSet xRS = xDRS.getStaticResultSet();
+            xRS.next();
+            
+            while(!xRS.isAfterLast())
+            {
+                System.out.println(xRS.getString(1));
+            }
+            
+            
             
         }
         catch (java.lang.Exception e){
